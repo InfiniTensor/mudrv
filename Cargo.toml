@@ -1,11 +1,3 @@
-[package]
-name = "mu_drv"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-
-
 [workspace]
 members = ["mudrv", "search-musa-tools"]
 resolver = "2"
@@ -13,3 +5,4 @@ resolver = "2"
 [workspace.dependencies]
 bindgen = "0.69"
 build-script-cfg = "0.0"
+half = "2.4"

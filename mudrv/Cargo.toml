@@ -5,9 +5,10 @@ edition = "2021"
 
 [dependencies]
 log = "0.4"
+half.workspace = true
 context-spore = "0.0"
 
 [build-dependencies]
 bindgen.workspace = true
 build-script-cfg.workspace = true
-search-musa-tools = { version = "0.1.0", path = "../search-musa-tools" }
+search-musa-tools = { path = "../search-musa-tools" }
