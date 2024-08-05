@@ -110,7 +110,7 @@ impl CurrentCtx {
     pub fn synchronize(&self) {
         mudrv!(muCtxSynchronize());
     }
-    
+
     #[inline]
     pub fn apply_current<T>(f: impl FnOnce(&Self) -> T) -> Result<T, NoCtxError> {
         let mut raw = null_mut();
@@ -122,16 +122,32 @@ impl CurrentCtx {
         }
     }
 
+    /// 直接指定当前上下文，并执行依赖上下文的操作。
+    ///
+    /// # Safety
+    ///
+    /// The `raw` context must be the current pushed context.
     #[inline]
     pub unsafe fn apply_current_unchecked<T>(raw: MUcontext, f: impl FnOnce(&Self) -> T) -> T {
         f(&Self(raw))
     }
 
+    /// Designates `raw` as the current context.
+    ///
+    /// # Safety
+    ///
+    /// The `raw` context must be the current pushed context.
+    /// Generally, this method only used for [`RawContainer::ctx`] with limited lifetime.
     #[inline]
     pub unsafe fn from_raw(raw: &MUcontext) -> &Self {
         &*(raw as *const _ as *const _)
     }
 
+    /// Wrap a raw object in a `RawContainer`.
+    ///
+    /// # Safety
+    ///
+    /// The raw object must be created in this [`Context`].
     #[inline]
     pub unsafe fn wrap_raw<T: Unpin + 'static>(&self, rss: T) -> RawContainer<MUcontext, T> {
         RawContainer { ctx: self.0, rss }
@@ -139,7 +155,6 @@ impl CurrentCtx {
 }
 
 impl CurrentCtx {
-    /// 将一段 host 存储空间注册为锁页内存，以允许从这个上下文直接访问。
     pub fn lock_page<T>(&self, slice: &[T]) {
         let ptrs = slice.as_ptr_range();
         mudrv!(muMemHostRegister_v2(
@@ -149,7 +164,6 @@ impl CurrentCtx {
         ));
     }
 
-    /// 将一段 host 存储空间从锁页内存注销。
     pub fn unlock_page<T>(&self, slice: &[T]) {
         mudrv!(muMemHostUnregister(slice.as_ptr() as _));
     }

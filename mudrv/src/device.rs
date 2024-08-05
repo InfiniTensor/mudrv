@@ -48,7 +48,7 @@ impl Device {
     pub fn compute_capability(&self) -> Version {
         Version {
             major: self.get_attribute(MU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR),
-            minor: self.get_attribute(MU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR)
+            minor: self.get_attribute(MU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR),
         }
     }
 
@@ -58,13 +58,6 @@ impl Device {
         mudrv!(muDeviceTotalMem_v2(&mut bytes, self.0));
         bytes.into()
     }
-
-    // #[inline]
-    // fn get_attribute(&self, attr: MUdevice_attribute) -> c_int {
-    //     let mut value = 0;
-    //     mudrv!(muDeviceGetAttribute(&mut value, attr, self.0));
-    //     value
-    // }
 
     #[inline]
     pub fn alignment(&self) -> usize {
@@ -130,16 +123,6 @@ impl Device {
     pub fn info(&self) -> InfoFmt {
         InfoFmt(self)
     }
-
-    // pub fn set_mempool_threshold(&self, threshold: u64) {
-    //     let mut mempool = null_mut();
-    //     mudrv!(muDeviceGetDefaultMemPool(&mut mempool, self.0));
-    //     mudrv!(muMemPoolSetAttribute(
-    //         mempool,
-    //         MUmemPool_attribute::MU_MEMPOOL_ATTR_RELEASE_THRESHOLD,
-    //         (&threshold) as *const _ as _,
-    //     ));
-    // }
 
     #[inline]
     fn get_attribute(&self, attr: MUdevice_attribute) -> c_int {

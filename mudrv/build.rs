@@ -17,7 +17,6 @@ fn main() {
         musa_path.join("lib").display()
     );
     println!("cargo:rustc-link-lib=dylib=musa");
-
     println!("cargo:rerun-if-changed=wrapper.h");
 
     let bindings = bindgen::Builder::default()

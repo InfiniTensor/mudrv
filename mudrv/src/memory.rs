@@ -4,9 +4,9 @@ use std::{
     alloc::Layout,
     marker::PhantomData,
     mem::size_of_val,
+    ops::{Deref, DerefMut},
     os::raw::c_void,
     ptr::null_mut,
-    ops::{Deref, DerefMut},
     slice::{from_raw_parts, from_raw_parts_mut},
 };
 
@@ -83,39 +83,6 @@ impl CurrentCtx {
     }
 }
 
-// impl<'ctx> Stream<'ctx> {
-//     pub fn malloc<T: Copy>(&self, len: usize) -> DevMem<'ctx> {
-//         let len = Layout::array::<T>(len).unwrap().size();
-//         let mut ptr = 0;
-//         mudrv!(muMemAllocAsync(&mut ptr, len, self.as_raw()));
-//         DevMem(
-//             unsafe { self.ctx().wrap_raw(Blob { ptr, len }) },
-//             PhantomData,
-//         )
-//     }
-
-//     pub fn from_host<T: Copy>(&self, slice: &[T]) -> DevMem<'ctx> {
-//         let stream = unsafe { self.as_raw() };
-//         let len = size_of_val(slice);
-//         let src = slice.as_ptr().cast();
-//         let mut ptr = 0;
-//         mudrv!(muMemAllocAsync(&mut ptr, len, stream));
-//         mudrv!(muMemcpyHtoDAsync_v2(ptr, src, len, stream));
-//         DevMem(
-//             unsafe { self.ctx().wrap_raw(Blob { ptr, len }) },
-//             PhantomData,
-//         )
-//     }
-// }
-
-// impl DevMem<'_> {
-//     #[inline]
-//     pub fn drop_on(self, stream: &Stream) {
-//         mudrv!(muMemFreeAsync(self.0.rss.ptr, stream.as_raw()));
-//         forget(self);
-//     }
-// }
-
 impl Drop for DevMem<'_> {
     #[inline]
     fn drop(&mut self) {
@@ -165,7 +132,6 @@ impl DevMemSpore {
         self.0.rss.len == 0
     }
 }
-
 
 // use crate::{Blob, CurrentCtx};
 // use context_spore::{impl_spore, AsRaw};

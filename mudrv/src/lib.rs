@@ -1,5 +1,4 @@
 #![cfg(detected_musa)]
-#![deny(warnings)]
 
 #[macro_use]
 #[allow(unused, non_upper_case_globals, non_camel_case_types, non_snake_case)]
@@ -11,31 +10,18 @@ pub mod bindings {
         ($f:expr) => {{
             #[allow(unused_imports)]
             use $crate::bindings::*;
-            #[allow(unused_unsafe)]
+            #[allow(unused_unsafe, clippy::macro_metavars_in_unsafe)]
             let error = unsafe { $f };
             assert_eq!(error, MUresult::MUSA_SUCCESS);
         }};
     }
-
-    #[macro_export]
-    macro_rules! murt {
-        ($f:expr) => {{
-            #[allow(unused_imports)]
-            use $crate::bindings::*;
-            #[aloow(unused_unsafe)]
-            let error = unsafe { $f };
-            assert_eq!(err, musaError::musaSuccess);
-        }};
-    }
-
 }
 
 mod context;
 mod device;
-mod memory;
 mod event;
+mod memory;
 mod stream;
-
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 pub struct NoDevice;
@@ -50,33 +36,14 @@ pub fn init() -> Result<(), NoDevice> {
     }
 }
 
-
 pub use context::{Context, CurrentCtx};
 pub use context_spore::{impl_spore, AsRaw, ContextResource, ContextSpore, RawContainer};
 pub use device::{BlockLimit, Device, SMLimit};
 pub use event::{Event, EventSpore};
+pub use memory::{
+    memcpy_d2d, memcpy_d2h, memcpy_h2d, DevByte, DevMem, DevMemSpore, HostMem, HostMemSpore,
+};
 pub use stream::{Stream, StreamSpore};
-pub use memory::{memcpy_d2d, memcpy_d2h, memcpy_h2d, DevByte, DevMem, DevMemSpore, HostMem, HostMemSpore};
-
-
-// #[inline]
-// pub fn init() {
-//     mudrv!(muInit(0));
-// }
-
-// #[inline]
-// pub fn version() -> i32 {
-//     let mut a:i32 = 0;
-//     mudrv!(muDriverGetVersion(&mut a));
-//     a
-// }
-
-// #[inline]
-// pub fn device_count() -> i32 {
-//     let mut count = 0;
-//     mudrv!(muDeviceGetCount(&mut count));
-//     count
-// }
 
 use std::{
     cmp::Ordering,
@@ -112,14 +79,14 @@ impl From<c_uint> for Dim3 {
 
 impl From<(c_uint, c_uint)> for Dim3 {
     #[inline]
-    fn from ((y, x): (c_uint, c_uint)) -> Self {
+    fn from((y, x): (c_uint, c_uint)) -> Self {
         Self { x, y, z: 1 }
     }
 }
 
 impl From<(c_uint, c_uint, c_uint)> for Dim3 {
     #[inline]
-    fn from ((z, y, x): (c_uint, c_uint, c_uint)) -> Self {
+    fn from((z, y, x): (c_uint, c_uint, c_uint)) -> Self {
         Self { x, y, z }
     }
 }
@@ -200,9 +167,23 @@ impl From<usize> for MemSize {
     }
 }
 
+#[inline]
+pub fn version() -> i32 {
+    let mut a: i32 = 0;
+    mudrv!(muDriverGetVersion(&mut a));
+    a
+}
+
+#[inline]
+pub fn device_count() -> i32 {
+    let mut count = 0;
+    mudrv!(muDeviceGetCount(&mut count));
+    count
+}
+
 #[test]
 fn test_bindings() {
     let _ = init();
-    // println!("{}", version());
-    // println!("{}", device_count());
+    println!("{}", version());
+    println!("{}", device_count());
 }

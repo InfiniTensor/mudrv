@@ -7,7 +7,10 @@ impl_spore!(Event and EventSpore by (CurrentCtx, MUevent));
 impl<'ctx> Stream<'ctx> {
     pub fn record(&self) -> Event<'ctx> {
         let mut event = null_mut();
-        mudrv!(muEventCreate(&mut event, MUstream_flags::MU_STREAM_DEFAULT as _));
+        mudrv!(muEventCreate(
+            &mut event,
+            MUstream_flags::MU_STREAM_DEFAULT as _
+        ));
         Event(unsafe { self.ctx().wrap_raw(event) }, PhantomData)
     }
 }
