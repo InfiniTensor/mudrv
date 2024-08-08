@@ -133,17 +133,6 @@ impl DevMemSpore {
     }
 }
 
-// use crate::{Blob, CurrentCtx};
-// use context_spore::{impl_spore, AsRaw};
-// use std::{
-//     alloc::Layout,
-//     marker::PhantomData,
-//     ops::{Deref, DerefMut},
-//     os::raw::c_void,
-//     ptr::null_mut,
-//     slice::{from_raw_parts, from_raw_parts_mut},
-// };
-
 impl_spore!(HostMem and HostMemSpore by (CurrentCtx, Blob<*mut c_void>));
 
 impl CurrentCtx {
