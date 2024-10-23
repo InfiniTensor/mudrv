@@ -17,6 +17,7 @@ fn main() {
         musa_path.join("lib").display()
     );
     println!("cargo:rustc-link-lib=dylib=musa");
+    println!("cargo:rustc-link-lib=dylib=musart");
     println!("cargo:rerun-if-changed=wrapper.h");
 
     let bindings = bindgen::Builder::default()
@@ -25,6 +26,7 @@ fn main() {
         .clang_arg("-include")
         .clang_arg("stdbool.h")
         .must_use_type("MUresult")
+        .must_use_type("musaError_t")
         .allowlist_function("mu.*")
         .allowlist_item("MU.*")
         .default_enum_style(bindgen::EnumVariation::Rust {

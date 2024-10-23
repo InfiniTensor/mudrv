@@ -15,6 +15,17 @@ pub mod bindings {
             assert_eq!(error, MUresult::MUSA_SUCCESS);
         }};
     }
+
+    #[macro_export]
+    macro_rules! muruntime {
+        ($f:expr) => {{
+            #[allow(unused_imports)]
+            use $crate::bindings::*;
+            #[allow(unused_unsafe, clippy::macro_metavars_in_unsafe)]
+            let error = unsafe { $f };
+            assert_eq!(error, musaError_t::musaSuccess);
+        }};
+    }
 }
 
 mod context;

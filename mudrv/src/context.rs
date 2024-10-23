@@ -139,7 +139,7 @@ impl CurrentCtx {
     /// The `raw` context must be the current pushed context.
     /// Generally, this method only used for [`RawContainer::ctx`] with limited lifetime.
     #[inline]
-    pub unsafe fn from_raw(raw: &MUcontext) -> &Self {
+    pub unsafe fn from_raw<'ctx>(raw: &MUcontext) -> &'ctx Self {
         &*(raw as *const _ as *const _)
     }
 
