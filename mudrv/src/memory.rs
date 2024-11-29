@@ -3,7 +3,7 @@ use context_spore::{impl_spore, AsRaw};
 use std::{
     alloc::Layout,
     marker::PhantomData,
-    mem::{forget, size_of_val},
+    mem::size_of_val,
     ops::{Deref, DerefMut},
     os::raw::c_void,
     ptr::null_mut,
@@ -66,14 +66,14 @@ impl Stream<'_> {
 impl_spore!(DevMem and DevMemSpore by (CurrentCtx, Blob<MUdeviceptr>));
 
 impl CurrentCtx {
-    pub fn malloc<T: Copy>(&self, len: usize) -> DevMem<'_> {
+    pub fn malloc<'ctx, T: Copy>(&self, len: usize) -> DevMem<'ctx> {
         let len = Layout::array::<T>(len).unwrap().size();
         let mut ptr = 0;
         mudrv!(muMemAlloc_v2(&mut ptr, len));
         DevMem(unsafe { self.wrap_raw(Blob { ptr, len }) }, PhantomData)
     }
 
-    pub fn from_host<T: Copy>(&self, slice: &[T]) -> DevMem<'_> {
+    pub fn from_host<'ctx, T: Copy>(&self, slice: &[T]) -> DevMem<'ctx> {
         let len = size_of_val(slice);
         let src = slice.as_ptr().cast();
         let mut ptr = 0;
@@ -85,34 +85,11 @@ impl CurrentCtx {
 
 impl<'ctx> Stream<'ctx> {
     pub fn malloc<T: Copy>(&self, len: usize) -> DevMem<'ctx> {
-        let len = Layout::array::<T>(len).unwrap().size();
-        let mut ptr = 0;
-        mudrv!(muMemAlloc_v2(&mut ptr, len));
-        DevMem(
-            unsafe { self.ctx().wrap_raw(Blob { ptr, len }) },
-            PhantomData,
-        )
+        self.ctx().malloc::<T>(len)
     }
 
     pub fn from_host<T: Copy>(&self, slice: &[T]) -> DevMem<'ctx> {
-        let stream = unsafe { self.as_raw() };
-        let len = size_of_val(slice);
-        let src = slice.as_ptr().cast();
-        let mut ptr = 0;
-        mudrv!(muMemAlloc_v2(&mut ptr, len));
-        mudrv!(muMemcpyHtoDAsync_v2(ptr, src, len, stream));
-        DevMem(
-            unsafe { self.ctx().wrap_raw(Blob { ptr, len }) },
-            PhantomData,
-        )
-    }
-}
-
-impl DevMem<'_> {
-    #[inline]
-    pub fn drop_on(self) {
-        mudrv!(muMemFree_v2(self.0.rss.ptr));
-        forget(self);
+        self.ctx().from_host(slice)
     }
 }
 

@@ -3,6 +3,6 @@ members = ["mudrv", "search-musa-tools"]
 resolver = "2"
 
 [workspace.dependencies]
-bindgen = "0.69"
+bindgen = "0.70"
 build-script-cfg = "0.0"
 half = "2.4"
