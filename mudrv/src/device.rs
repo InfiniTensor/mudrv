@@ -132,6 +132,13 @@ impl Device {
     }
 }
 
+pub fn mem_get_info() -> (usize, usize) {
+    let mut free = 0;
+    let mut total = 0;
+    muruntime!(musaMemGetInfo(&mut free, &mut total));
+    (free, total)
+}
+
 pub struct InfoFmt<'a>(&'a Device);
 
 impl fmt::Display for InfoFmt<'_> {

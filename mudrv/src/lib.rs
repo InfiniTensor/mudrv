@@ -49,7 +49,7 @@ pub fn init() -> Result<(), NoDevice> {
 
 pub use context::{Context, CurrentCtx};
 pub use context_spore::{impl_spore, AsRaw, ContextResource, ContextSpore, RawContainer};
-pub use device::{BlockLimit, Device, SMLimit};
+pub use device::{mem_get_info, BlockLimit, Device, SMLimit};
 pub use event::{Event, EventSpore};
 pub use memory::{
     memcpy_d2d, memcpy_d2h, memcpy_h2d, DevByte, DevMem, DevMemSpore, HostMem, HostMemSpore,
